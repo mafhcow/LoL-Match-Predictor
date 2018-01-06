@@ -6,7 +6,7 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
 from sklearn.svm import SVC
 from sklearn.metrics import classification_report
-from sklearn.metric import accuracy_score
+from sklearn.metrics import accuracy_score
 
 def map_champions_to_ids():
     champion_metadata = open('../Data/champion_metadata.json', 'r')

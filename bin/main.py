@@ -20,9 +20,10 @@ class SimpleNN(nn.Module):
         self.linear = nn.Linear(input_size, hidden)
         self.out = nn.Linear(hidden, 2)
         self.softmax = nn.LogSoftmax()
-
+        self.dropout = nn.Dropout(p = 0.2)
+        
     def forward(self, input):
-        hidden = relu(self.linear(input))
+        hidden = self.dropout(relu(self.linear(input)))
         out = self.out(hidden)
         out = self.softmax(out)
         return out
@@ -38,9 +39,9 @@ def map_champions_to_ids():
     return idx, mapping
 
 def one_hot(champ_ids, max_length):
-    vector = [0] * (max_length + 1)
+    vector = [0.0] * (max_length + 1)
     for champ_id in champ_ids:
-        vector[champ_id] = 1
+        vector[champ_id] = 1.0
     return vector
 
 def parse_line(line):
@@ -66,12 +67,11 @@ def build_one_hot_data():
 inputs, outputs = build_one_hot_data()
 input_train, input_test, output_train, output_test = train_test_split(inputs, outputs, test_size = 0.25)
 
-
-##classifier = RandomForestClassifier()
-##classifier.fit(input_train, output_train)
-##predictions = classifier.predict(input_test)
-##print(classification_report(output_test, predictions, digits=4))
-##print('Accuracy for random forest: ' + str(accuracy_score(output_test, predictions)))
+#classifier = RandomForestClassifier(n_estimators = 200, n_jobs = -1)
+#classifier.fit(input_train, output_train)
+#predictions = classifier.predict(input_test)
+#print(classification_report(output_test, predictions, digits=4))
+#print('Accuracy for random forest: ' + str(accuracy_score(output_test, predictions)))
 
 ##classifier = SVC()
 ##classifier.fit(input_train, output_train)
@@ -84,25 +84,28 @@ input_test = torch.FloatTensor(input_test)
 output_train = torch.LongTensor(output_train)
 output_test = torch.LongTensor(output_test)
 
-model = SimpleNN(len(input_train[0]), 200)
+
+model = SimpleNN(len(input_train[0]), 100)
 criterion = nn.NLLLoss()
-optimizer = torch.optim.Adam(filter(lambda p: p.requires_grad, model.parameters()), lr=0.0001)
+
 
 def train_model(train_data, test_data, model):
-    optimizer = torch.optim.Adam(filter(lambda p: p.requires_grad, model.parameters()), lr=0.0001)
+    optimizer = torch.optim.Adam(filter(lambda p: p.requires_grad, model.parameters()), lr= 1e-5, weight_decay = 1e-6)
     prev_time = time.time()
     for epoch in range(50):
         print("****************************************")
-	print("Epoch", epoch + 1)
-
-	loss = run_epoch(train_data, True, model, optimizer)
+        print("Epoch", epoch + 1)
+        
+        loss = run_epoch(train_data, True, model, optimizer)
         print("Trained in:", time.time() - prev_time)
-	print("Loss:", loss)
-	accuracy = run_epoch(test_data, False, model, optimizer)
-	print("Tested in:", time.time() - prev_time)
-	print("Accuracy:", accuracy)
-	prev_time = time.time()
+        print("Loss:", loss)
+        accuracy = run_epoch(test_data, False, model, optimizer)
+        print("Tested in:", time.time() - prev_time)
+        print("Accuracy:", accuracy)
+        prev_time = time.time()
 
+import math
+        
 def run_epoch(data, is_training, model, optimizer):
     data_loader = torch.utils.data.DataLoader(
         data,
@@ -112,6 +115,7 @@ def run_epoch(data, is_training, model, optimizer):
         drop_last=False)
 
     losses = []
+    true_labels = []
     for batch in data_loader:
         input = Variable(batch['input'])
         output = Variable(batch['output'])
@@ -125,19 +129,22 @@ def run_epoch(data, is_training, model, optimizer):
             def predict(out):
                 predictions = []
                 for i in range(out.shape[0]):
-                    if out[i][0] > out[i][1]:
-                        predictions.append(0)
-                    else:
-                        predictions.append(1)
+                    predictions.append(math.exp(out[i][1]))
+                    #if out[i][0] > out[i][1]:
+                    #    predictions.append(0)
+                    #else:
+                    #    predictions.append(1)
                 return predictions
             guesses = predict(predictions.data.numpy())
             losses.extend(guesses)
+            true_labels.extend(output.data.numpy())
 
     if is_training:
         avg_loss = np.mean(losses)
         return avg_loss
     else:
-        accuracy = accuracy_score(np.array(losses), [x['output'] for x in data])
+        accuracy = sklearn.metrics.roc_auc_score(true_labels, np.array(losses))
+        #accuracy = accuracy_score(np.array(losses), true_labels)
         return accuracy
 
 train_data = [{'input': x, 'output': y} for (x,y) in zip(input_train, output_train)]

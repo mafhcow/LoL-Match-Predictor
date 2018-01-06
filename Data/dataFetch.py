@@ -26,7 +26,7 @@ def getMatches(html):
         return None
     datastore = json.loads(html)
     matchIds = []
-    for i in range(len(datastore['matches'])): # only grabbing 20 matches
+    for i in range(len(datastore['matches'])): # maybe fewer than 20 matches
         matchIds.append(datastore['matches'][i]['gameId'])
     return matchIds
 

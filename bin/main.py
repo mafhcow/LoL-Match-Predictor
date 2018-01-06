@@ -66,19 +66,18 @@ def build_one_hot_data():
 inputs, outputs = build_one_hot_data()
 input_train, input_test, output_train, output_test = train_test_split(inputs, outputs, test_size = 0.25)
 
-##classifier = RandomForestClassifier(n_estimators=100)
+
+##classifier = RandomForestClassifier()
 ##classifier.fit(input_train, output_train)
 ##predictions = classifier.predict(input_test)
-##print(np.sum(predictions))
-##print(len(predictions))
 ##print(classification_report(output_test, predictions, digits=4))
-##print('Accuracy for random forest:', accuracy_score(output_test, predictions))
+##print('Accuracy for random forest: ' + str(accuracy_score(output_test, predictions)))
 
 ##classifier = SVC()
 ##classifier.fit(input_train, output_train)
 ##predictions = classifier.predict(input_test)
 ##print(classification_report(output_test, predictions, digits=4))
-##print('Accuracy for SVM:', accuracy_score(output_test, predictions))
+##print('Accuracy for SVM: ' + str(accuracy_score(output_test, predictions)))
 
 input_train = torch.FloatTensor(input_train)
 input_test = torch.FloatTensor(input_test)

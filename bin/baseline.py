@@ -13,16 +13,17 @@ def parse_line(line):
     red_champs = [int(x) for x in red_champs.split(' ')]
     result = int(result)
     return (blue_champs, red_champs, result)
+	
+data = []
+with open('../Data/champions.txt', 'r') as f:
+	for line in f.readlines():
+		data.append(parse_line(line))
 
 def test_baseline(trials, r):
 	total_accuracy = 0
 	for i in range(trials):
 		if i%(trials/10) == 0:
 			print(str(int(100*i/trials)) + '% done')
-		data = []
-		with open('../Data/champions.txt', 'r') as f:
-				for line in f.readlines():
-					data.append(parse_line(line))
 		random.shuffle(data)
 		N = len(data)
 		training_data = data[:int(3*N/4)]

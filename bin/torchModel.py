@@ -73,25 +73,29 @@ rawData = readData(dataPath)
 champIds, index = getIdMapping(rawData)
 X, Y, Xtest, Ytest = generateTrainTest(rawData, champIds)
 
-def train_model(train_data, test_data, model):
+def train_model(train_data, test_data, model, gpu = False):
     optimizer = torch.optim.Adam(filter(lambda p: p.requires_grad, model.parameters()), lr= 1e-5, weight_decay = 1e-6)
     prev_time = time.time()
+
+    if gpu:
+        model.cuda()
+
     for epoch in range(50):
         print("****************************************")
         print("Epoch", epoch + 1)
     
-        loss = run_epoch(train_data, True, model, optimizer)
+        loss = run_epoch(train_data, True, model, optimizer, gpu = gpu)
         print("Trained in:", time.time() - prev_time)
         print("Loss:", loss)
-        accuracy = run_epoch(test_data, False, model, optimizer)
+        accuracy = run_epoch(test_data, False, model, optimizer, gpu = gpu)
         print("Tested in:", time.time() - prev_time)
         print("Accuracy:", accuracy)
         prev_time = time.time()
-        torch.save(model, "model{}".format(epoch))
+        torch.save(model, "models/model{}".format(epoch))
         
 import math
 
-def run_epoch(data, is_training, model, optimizer):
+def run_epoch(data, is_training, model, optimizer, gpu = False):
     data_loader = torch.utils.data.DataLoader(
         data,
         batch_size=50,
@@ -110,6 +114,11 @@ def run_epoch(data, is_training, model, optimizer):
     for batch in data_loader:
         input = Variable(batch['input'])
         output = Variable(batch['output'])
+
+        if gpu:
+            input = input.cuda()
+            output = output.cuda()
+            
         predictions = model(input)
         if is_training:
             loss = criterion(predictions, output)
@@ -126,9 +135,9 @@ def run_epoch(data, is_training, model, optimizer):
                     #else:
                     #    predictions.append(1)
                 return predictions
-            guesses = predict(predictions.data.numpy())
+            guesses = predict(predictions.cpu().data.numpy())
             losses.extend(guesses)
-            true_labels.extend(output.data.numpy())
+            true_labels.extend(output.cpu().data.numpy())
                 
     if is_training:
         avg_loss = np.mean(losses)
@@ -149,4 +158,4 @@ criterion = nn.NLLLoss()
 train_data = [{'input': x, 'output': y} for (x,y) in zip(input_train, output_train)]
 test_data = [{'input': x, 'output': y} for (x,y) in zip(input_test, output_test)]
 
-train_model(train_data, test_data, model)
+train_model(train_data, test_data, model, gpu = True)

@@ -1,5 +1,6 @@
 import time
 import json
+from xgboost import XGBClassifier
 import sklearn
 import numpy as np
 import torch
@@ -73,11 +74,17 @@ input_train, input_test, output_train, output_test = train_test_split(inputs, ou
 #print(classification_report(output_test, predictions, digits=4))
 #print('Accuracy for random forest: ' + str(accuracy_score(output_test, predictions)))
 
-##classifier = SVC()
-##classifier.fit(input_train, output_train)
-##predictions = classifier.predict(input_test)
-##print(classification_report(output_test, predictions, digits=4))
-##print('Accuracy for SVM: ' + str(accuracy_score(output_test, predictions)))
+#classifier = XGBClassifier()
+#classifier.fit(input_train, output_train)
+#predictions = classifier.predict(input_test)
+#print(classification_report(output_test, predictions, digits=4))
+#print('Accuracy for xgboost: ' + str(accuracy_score(output_test, predictions)))
+
+#classifier = SVC()
+#classifier.fit(input_train, output_train)
+#predictions = classifier.predict(input_test)
+#print(classification_report(output_test, predictions, digits=4))
+#print('Accuracy for SVM: ' + str(accuracy_score(output_test, predictions)))
 
 input_train = torch.FloatTensor(input_train)
 input_test = torch.FloatTensor(input_test)

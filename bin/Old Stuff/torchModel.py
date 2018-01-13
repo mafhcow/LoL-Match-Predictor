@@ -18,9 +18,9 @@ from EmbeddingNN import EmbeddingNN
 from RNN import RNN
 import torch.nn.functional as F
 
-gpu = True
-#dataPath = "../Data/champions.txt"
-dataPath = "../Data/drafted_champions.txt"
+gpu = False
+dataPath = "../Data/champions.txt"
+#dataPath = "../Data/drafted_champions.txt"
 
 def readData(dataPath, draftOrder = False):
     with open(dataPath) as f:
@@ -102,7 +102,7 @@ def train_model(train_data, test_data, model, gpu = False):
         print("Tested in:", time.time() - prev_time)
         print("Accuracy:", accuracy)
         prev_time = time.time()
-        torch.save(model, "models/model{}".format(epoch))
+        #torch.save(model, "models/model{}".format(epoch))
         
 import math
 
@@ -169,7 +169,7 @@ output_train = torch.LongTensor(Y)
 output_test = torch.LongTensor(Ytest)
 
 if not(draftOrder):
-    model = EmbeddingNN(len(input_train[0]), 300, 0.2, 300)
+    model = EmbeddingNN(len(input_train[0]), 300, 0, 300)
 else:
     model = RNN(139, 1000, 0.2)
 criterion = nn.NLLLoss()

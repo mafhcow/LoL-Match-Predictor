@@ -68,7 +68,6 @@ for fileName in f:
     i += 1
 
     if i % 1000 == 0:
-        break
         print(i)
 
 newf.close()

@@ -2,7 +2,7 @@ import json
 import os
 
 def get_champions_from_file(filename):
-        file = open('../matches/{0}'.format(filename), 'r', encoding='utf-8')
+        file = open('../../matches/{0}'.format(filename), 'r', encoding='utf-8')
         text = file.read()
         parsed = json.loads(text)
         if len(parsed['participants']) != 10:
@@ -26,7 +26,7 @@ def parse(blue_champions, red_champions, result):
 
 def get_all_champions_from_files():
     results = []
-    data_files = [x for x in os.listdir('../matches') if x.endswith('.json')]
+    data_files = [x for x in os.listdir('../../matches') if x.endswith('.json')]
 
     for filename in data_files:
         blue_champions, red_champions, result = get_champions_from_file(filename)
@@ -35,7 +35,7 @@ def get_all_champions_from_files():
 
     return results
 
-out_file = open('../Data/champions.txt', 'w')
+out_file = open('../../Data/champions.txt', 'w')
 results = get_all_champions_from_files()
 for result in results:
     out_file.write(result + '\n')

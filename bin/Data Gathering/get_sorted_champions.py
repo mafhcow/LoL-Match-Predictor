@@ -2,7 +2,7 @@ from os import walk
 import json
 
 f = []
-for (dirpath, dirnames, filenames) in walk("../matches/"):
+for (dirpath, dirnames, filenames) in walk("../../matches/"):
     f.extend(filenames)
     break
 
@@ -31,12 +31,12 @@ def allNonZero(array):
             return False
     return True
 
-newf = open("../Data/champions.txt", "w")
+newf = open("../../Data/champions.txt", "w")
 
 count = 0
 i = 0
 for fileName in f:
-    with open("../matches/" + fileName) as f:
+    with open("../../matches/" + fileName) as f:
         contents = f.read()
     ds = json.loads(contents)
 
@@ -55,7 +55,8 @@ for fileName in f:
             out = fillIn(red, cid, lane, role)
         #print((cid, lane, role))
     if allNonZero(blue) and allNonZero(red):
-        print >> newf, " ".join([str(x) for x in blue]) + "\t" + " ".join([str(x) for x in red]) + "\t" + str(bluewin)
+        #print >> newf, " ".join([str(x) for x in blue]) + "\t" + " ".join([str(x) for x in red]) + "\t" + str(bluewin)
+		print(" ".join([str(x) for x in blue]) + "\t" + " ".join([str(x) for x in red]) + "\t" + str(bluewin), file=newf)
         count += 1
         
     i += 1

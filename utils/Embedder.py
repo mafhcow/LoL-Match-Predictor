@@ -103,11 +103,6 @@ class Embedder:
 		pca.fit(sim_matrix)
 		sim_matrix = pca.transform(sim_matrix)
 		self.sim_matrix = sim_matrix
-	
-	def one_hot(self, id):
-		arr = [0]*NUM_CHAMPS
-		arr[id_to_num(id)] = 1
-		return arr
 		
 	def embed(self, id):
 		return list(self.sim_matrix[id_to_num(id)])

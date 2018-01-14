@@ -27,5 +27,30 @@ def num_to_id(num):
 def id_to_name(id):
 	return id_to_name_map[id]
 
+def rank_to_one_hot(rank):
+	if rank == 'UNRANKED':
+		return [1, 0, 0, 0, 0, 0, 0, 0]
+	if rank == 'BRONZE':
+		return [0, 1, 0, 0, 0, 0, 0, 0]
+	if rank == 'SILVER':
+		return [0, 0, 1, 0, 0, 0, 0, 0]
+	if rank == 'GOLD':
+		return [0, 0, 0, 1, 0, 0, 0, 0]
+	if rank == 'PLATINUM':
+		return [0, 0, 0, 0, 1, 0, 0, 0]
+	if rank == 'DIAMOND':
+		return [0, 0, 0, 0, 0, 1, 0, 0]
+	if rank == 'MASTER':
+		return [0, 0, 0, 0, 0, 0, 1, 0]
+	if rank == 'CHALLENGER':
+		return [0, 0, 0, 0, 0, 0, 0, 1]
+
 def num_champs():
 	return len(id_to_num_map.keys())
+
+def id_to_one_hot(id):
+	NUM_CHAMPS = num_champs()
+	arr = [0]*NUM_CHAMPS
+	arr[id_to_num(id)] = 1
+	return arr
+	

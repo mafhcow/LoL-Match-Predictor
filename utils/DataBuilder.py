@@ -51,6 +51,12 @@ class DataBuilder:
 		return torch.FloatTensor(np.array(input_train)), torch.FloatTensor(np.array(input_test)), torch.LongTensor(np.array(output_train)), torch.LongTensor(np.array(output_test))
 '''
 
+def arr_sum(a1, a2):
+	ret = []
+	for i in range(len(a1)):
+		ret.append(a1[i] + a2[i])
+	return ret
+		
 def parse_line(line):
 	blue_info, red_info, result = line.split('\t')
 	blue_info = blue_info.split(' ')
@@ -59,6 +65,7 @@ def parse_line(line):
 	blue_ranks = []
 	red_champs = []
 	red_ranks = []
+	avg_rank = [0]*8
 	for i in range(10):
 		if i % 2 == 0:
 			blue_champs.append(int(blue_info[i]))
@@ -66,6 +73,28 @@ def parse_line(line):
 		else:
 			blue_ranks.append(rank_to_one_hot(blue_info[i]))
 			red_ranks.append(rank_to_one_hot(red_info[i]))
+	for arr in blue_ranks:
+		avg_rank = arr_sum(avg_rank, arr)
+	for arr in blue_ranks:
+		avg_rank = arr_sum(avg_rank, arr)
+	num_unrankeds = avg_rank[7]
+	if num_unrankeds != 10:
+		for i in range(7):
+			avg_rank[i] = 1.0*avg_rank[i]/(10 - num_unrankeds)
+		avg_rank[7] = 0
+		for i in range(5):
+			if blue_ranks[i][7] == 1:
+				blue_ranks[i] = avg_rank[:]
+			blue_ranks[i] = blue_ranks[i][:7]
+		for i in range(5):
+			if red_ranks[i][7] == 1:
+				red_ranks[i] = avg_rank[:]
+			red_ranks[i] = red_ranks[i][:7]
+	else:
+		for i in range(5):
+			blue_ranks[i] = blue_ranks[i][:7]
+		for i in range(5):
+			red_ranks[i] = red_ranks[i][:7]
 	result = int(result)
 	return blue_champs, blue_ranks, red_champs, red_ranks, result
 
@@ -99,6 +128,7 @@ class DataBuilder:
 					red_vector = red_vector + id_to_one_hot(red_champs[i]) + red_ranks[i]
 			inputs.append(blue_vector + red_vector)
 			outputs.append(result)
+		print(len(blue_vector + red_vector))
 		
 		l = len(inputs)
 		input_train = inputs[:int(self.split*l)]

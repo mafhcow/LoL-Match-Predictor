@@ -2,7 +2,7 @@ import torch
 import random
 import numpy as np
 from mappings import rank_to_one_hot, id_to_one_hot
-from Embedder import Embedder
+from Embedder2 import Embedder
 '''
 def parse_line(line):
 	blue_champs, red_champs, result = line.split('\t')
@@ -18,10 +18,10 @@ class DataBuilder:
 			data = []
 			for line in f.readlines():
 				data.append(parse_line(line))
-		random.shuffle(data)
-		data_train = data[:int(self.split*len(data))]
+		#random.shuffle(data)
+		#data_train = data[:int(self.split*len(data))]
 		self.data = data
-		self.embedder = Embedder(data_train)
+		self.embedder = Embedder()
 		
 	def build_data(self, embed=False):
 		inputs = []
@@ -75,7 +75,7 @@ def parse_line(line):
 			red_ranks.append(rank_to_one_hot(red_info[i]))
 	for arr in blue_ranks:
 		avg_rank = arr_sum(avg_rank, arr)
-	for arr in blue_ranks:
+	for arr in red_ranks:
 		avg_rank = arr_sum(avg_rank, arr)
 	num_unrankeds = avg_rank[7]
 	if num_unrankeds != 10:
@@ -105,13 +105,13 @@ class DataBuilder:
 			data = []
 			for line in f.readlines():
 				data.append(parse_line(line))
-		random.shuffle(data)
-		no_rank_data = []
-		for game in data:
-			no_rank_data.append((game[0], game[2], game[4]))
-		no_rank_data_train = no_rank_data[:int(self.split*len(data))]
+		#random.shuffle(data)
+		#no_rank_data = []
+		#for game in data:
+		#	no_rank_data.append((game[0], game[2], game[4]))
+		#no_rank_data_train = no_rank_data[:int(self.split*len(data))]
 		self.data = data
-		self.embedder = Embedder(no_rank_data_train)
+		self.embedder = Embedder()
 		
 	def build_data(self, embed=False):
 		inputs = []
@@ -128,7 +128,6 @@ class DataBuilder:
 					red_vector = red_vector + id_to_one_hot(red_champs[i]) + red_ranks[i]
 			inputs.append(blue_vector + red_vector)
 			outputs.append(result)
-		print(len(blue_vector + red_vector))
 		
 		l = len(inputs)
 		input_train = inputs[:int(self.split*l)]
@@ -138,4 +137,4 @@ class DataBuilder:
 			
 		return torch.FloatTensor(np.array(input_train)), torch.FloatTensor(np.array(input_test)), torch.LongTensor(np.array(output_train)), torch.LongTensor(np.array(output_test))
 
-		
+	
